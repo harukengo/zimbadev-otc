@@ -121,6 +121,10 @@ public:
     Position getCameraPosition();
     void setCameraPosition(const Position& pos);
 
+    std::vector<CreaturePtr> getSightSpectators(bool multiFloor = false);
+    std::vector<CreaturePtr> getSpectators(bool multiFloor = false);
+
+
 
     void setMinimumAmbientLight(const float intensity) { m_minimumAmbientLight = intensity; updateLight(); }
     float getMinimumAmbientLight() const { return m_minimumAmbientLight; }
