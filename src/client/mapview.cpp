@@ -933,6 +933,7 @@ void MapView::updateViewportDirectionCache()
 }
 
 Position MapView::getCameraPosition() { return isFollowingCreature() ? m_followingCreature->getPosition() : m_customCameraPosition; }
+
 std::vector<CreaturePtr> MapView::getSightSpectators(const bool multiFloor)
 {
     return g_map.getSpectatorsInRangeEx(getCameraPosition(), multiFloor, m_posInfo.awareRange.left - 1, m_posInfo.awareRange.right - 2, m_posInfo.awareRange.top - 1, m_posInfo.awareRange.bottom - 2);
@@ -965,12 +966,14 @@ void MapView::destroyHighlightTile() {
 void MapView::addForegroundTile(const TilePtr& tile) {
     std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutex());
 
-    if (std::ranges::find(m_foregroundTiles, tile) == m_foregroundTiles.end())
+    if (std::find(m_foregroundTiles.begin(), m_foregroundTiles.end(), tile) == m_foregroundTiles.end())
         m_foregroundTiles.emplace_back(tile);
 }
+
 void MapView::removeForegroundTile(const TilePtr& tile) {
     std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutex());
-    const auto it = std::ranges::find(m_foregroundTiles, tile);
+
+    const auto it = std::find(m_foregroundTiles.begin(), m_foregroundTiles.end(), tile);
     if (it == m_foregroundTiles.end())
         return;
 
