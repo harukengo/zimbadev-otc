@@ -1,0 +1,57 @@
+name: Build OTClient Windows
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    env:
+      VCPKG_ROOT: ${{ github.workspace }}\vcpkg
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          .\bootstrap-vcpkg.bat
+
+      - name: Configure CMake (preset se existir)
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}\scripts\buildsystems\vcpkg.cmake -A x64
+
+      - name: Build (Release)
+        run: |
+          cd build
+          cmake --build . --config Release --parallel
+
+      # Ajuste estes caminhos conforme o que o projeto gerar
+      - name: Prepare artifact folder
+        run: |
+          mkdir dist
+          copy build\Release\otclient.exe dist\
+          xcopy data dist\data /E /I /Y
+          xcopy modules dist\modules /E /I /Y
+          if exist mods xcopy mods dist\mods /E /I /Y
+
+      - name: Create zip
+        run: |
+          powershell -Command "Compress-Archive -Path dist\* -DestinationPath otclient-windows.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: otclient-windows
+          path: otclient-windows.zip
