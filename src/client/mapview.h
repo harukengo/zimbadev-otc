@@ -113,12 +113,14 @@ public:
     void setFloorViewMode(FloorViewMode viewMode);
 
     // camera related
+// camera related
     CreaturePtr getFollowingCreature() { return m_followingCreature; }
     void followCreature(const CreaturePtr& creature);
     bool isFollowingCreature() const { return m_followingCreature && m_follow; }
 
     Position getCameraPosition();
     void setCameraPosition(const Position& pos);
+
 
     void setMinimumAmbientLight(const float intensity) { m_minimumAmbientLight = intensity; updateLight(); }
     float getMinimumAmbientLight() const { return m_minimumAmbientLight; }
